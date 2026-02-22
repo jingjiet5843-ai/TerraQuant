@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TerraQuant — 量化选股系统</title>
+<meta name="description" content="全自动量化选股系统，10年回测累计回报 2494%。每月自动发出调仓信号，跟着操作即可。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-primary: #06080d;
+  --bg-card: #0c1018;
+  --bg-card-hover: #111825;
+  --border: rgba(255,255,255,0.06);
+  --border-accent: rgba(34,211,238,0.2);
+  --text-primary: #e8edf5;
+  --text-secondary: #7a8ba8;
+  --text-muted: #3d4f6a;
+  --accent: #22d3ee;
+  --accent-glow: rgba(34,211,238,0.15);
+  --green: #10b981;
+  --green-glow: rgba(16,185,129,0.15);
+  --red: #ef4444;
+  --gold: #f59e0b;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+/* === GRID BACKGROUND === */
+.grid-bg {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+    linear-gradient(rgba(34,211,238,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,211,238,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glow-orb {
+  position: fixed;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.07;
+  pointer-events: none;
+  z-index: 0;
+}
+.glow-orb-1 { background: var(--accent); top: -200px; right: -100px; }
+.glow-orb-2 { background: #8b5cf6; bottom: -200px; left: -100px; }
+
+/* === LAYOUT === */
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* === NAV === */
+nav {
+  padding: 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+}
+.logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.5px;
+  color: var(--accent);
+}
+.logo span { color: var(--text-muted); font-weight: 400; }
+.nav-tag {
+  font-size: 11px;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 1px;
+}
+
+/* === HERO === */
+.hero {
+  padding: 100px 0 60px;
+  text-align: center;
+}
+.hero-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent);
+  background: var(--accent-glow);
+  border: 1px solid rgba(34,211,238,0.15);
+  padding: 6px 16px;
+  border-radius: 20px;
+  margin-bottom: 28px;
+  letter-spacing: 0.5px;
+}
+.hero h1 {
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -2px;
+  margin-bottom: 20px;
+}
+.hero h1 em {
+  font-style: normal;
+  background: linear-gradient(135deg, var(--accent), #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero-sub {
+  font-size: 18px;
+  color: var(--text-secondary);
+  max-width: 560px;
+  margin: 0 auto 40px;
+  line-height: 1.7;
+}
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--accent);
+  color: #06080d;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 16px 36px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s;
+  box-shadow: 0 0 40px rgba(34,211,238,0.2);
+}
+.hero-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 60px rgba(34,211,238,0.35);
+}
+
+/* === STATS BAR === */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 60px 0;
+}
+.stat-item {
+  background: var(--bg-card);
+  padding: 28px 16px;
+  text-align: center;
+  transition: background 0.3s;
+}
+.stat-item:hover { background: var(--bg-card-hover); }
+.stat-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.stat-value.green { color: var(--green); }
+.stat-value.accent { color: var(--accent); }
+.stat-value.gold { color: var(--gold); }
+.stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+/* === COMPARISON TABLE === */
+.section { padding: 60px 0; }
+.section-label {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.section-title {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  margin-bottom: 40px;
+}
+
+.comparison {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.comp-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+}
+.comp-header div {
+  padding: 16px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+.comp-header div:nth-child(2) { color: var(--accent); text-align: right; }
+.comp-header div:nth-child(3) { color: var(--text-muted); text-align: right; }
+.comp-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+}
+.comp-row:last-child { border-bottom: none; }
+.comp-row:hover { background: var(--bg-card-hover); }
+.comp-row div {
+  padding: 16px 20px;
+  font-size: 15px;
+}
+.comp-row div:first-child { color: var(--text-secondary); }
+.comp-row div:nth-child(2) {
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  color: var(--green);
+}
+.comp-row div:nth-child(3) {
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+}
+
+/* === FEATURES === */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 24px;
+  transition: all 0.3s;
+}
+.feature-card:hover {
+  border-color: var(--border-accent);
+  background: var(--bg-card-hover);
+  transform: translateY(-2px);
+}
+.feature-icon {
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+.feature-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.feature-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* === HOW IT WORKS === */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.step {
+  position: relative;
+  padding: 32px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.step-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--bg-card-hover);
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  line-height: 1;
+  color: rgba(255,255,255,0.04);
+}
+.step-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.step-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* === LIVE TRACKER === */
+.live-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  border-radius: 12px;
+  padding: 36px;
+  text-align: center;
+}
+.live-pulse {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--green);
+  margin-bottom: 20px;
+}
+.pulse-dot {
+  width: 8px; height: 8px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
+  50% { opacity: 0.7; box-shadow: 0 0 0 8px rgba(16,185,129,0); }
+}
+.live-holdings {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+.holding-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent);
+  background: var(--accent-glow);
+  border: 1px solid rgba(34,211,238,0.12);
+  padding: 6px 14px;
+  border-radius: 6px;
+}
+.live-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 16px;
+}
+
+/* === CTA === */
+.cta-section {
+  padding: 80px 0;
+  text-align: center;
+}
+.cta-title {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  margin-bottom: 16px;
+}
+.cta-sub {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 36px;
+}
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--accent);
+  color: #06080d;
+  font-weight: 700;
+  font-size: 18px;
+  padding: 18px 48px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s;
+  box-shadow: 0 0 50px rgba(34,211,238,0.25);
+}
+.cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 80px rgba(34,211,238,0.4);
+}
+.cta-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 16px;
+}
+
+/* === FOOTER === */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 32px 0;
+  text-align: center;
+}
+.footer-disclaimer {
+  font-size: 11px;
+  color: var(--text-muted);
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* === ANIMATIONS === */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeIn 0.6s ease forwards;
+}
+@keyframes fadeIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .features-grid { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; }
+  .comp-header div, .comp-row div { padding: 12px 14px; font-size: 13px; }
+  .hero { padding: 60px 0 40px; }
+  .stat-value { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="glow-orb glow-orb-1"></div>
+<div class="glow-orb glow-orb-2"></div>
+
+<div class="container">
+
+  <!-- NAV -->
+  <nav class="fade-in">
+    <div class="logo">TerraQuant<span> v2.0</span></div>
+    <div class="nav-tag">QUANTITATIVE SYSTEM</div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge fade-in delay-1">🔬 全自动量化选股 · 每月一次调仓 · 实盘验证中</div>
+    <h1 class="fade-in delay-2">不看盘，不研究，<br><em>跟着信号操作就好</em></h1>
+    <p class="hero-sub fade-in delay-3">
+      TerraQuant 是一套全自动量化选股系统。<br>
+      每月月末自动计算最优持仓，推送到 Discord。<br>
+      你只需要跟着买卖。
+    </p>
+    <a href="https://discord.gg/59CzVKaC" target="_blank" class="hero-cta fade-in delay-4">
+      加入 Discord（免费）→
+    </a>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-bar fade-in delay-3">
+    <div class="stat-item">
+      <div class="stat-value green mono">2494%</div>
+      <div class="stat-label">10年累计回报</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value accent mono">37.9%</div>
+      <div class="stat-label">年化收益 (CAGR)</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value gold mono">1.38</div>
+      <div class="stat-label">夏普比率</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value mono" style="color: var(--text-primary);">-26.2%</div>
+      <div class="stat-label">最大回撤</div>
+    </div>
+  </div>
+
+  <!-- COMPARISON -->
+  <section class="section">
+    <div class="section-label">PERFORMANCE</div>
+    <div class="section-title">10 年回测 vs 标普500</div>
+    <div class="comparison">
+      <div class="comp-header">
+        <div>指标</div>
+        <div>TerraQuant</div>
+        <div>S&P 500</div>
+      </div>
+      <div class="comp-row">
+        <div>累计回报 (Total Return)</div>
+        <div>2494.27%</div>
+        <div>299.00%</div>
+      </div>
+      <div class="comp-row">
+        <div>年化收益 (CAGR)</div>
+        <div>37.91%</div>
+        <div>14.64%</div>
+      </div>
+      <div class="comp-row">
+        <div>最大回撤 (Max Drawdown)</div>
+        <div style="color: var(--text-primary);">-26.19%</div>
+        <div>-33.72%</div>
+      </div>
+      <div class="comp-row">
+        <div>夏普比率 (Sharpe Ratio)</div>
+        <div>1.38</div>
+        <div>0.85</div>
+      </div>
+      <div class="comp-row">
+        <div>回测时间</div>
+        <div style="color: var(--text-secondary);">2016 — 2026</div>
+        <div>2016 — 2026</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section">
+    <div class="section-label">SYSTEM</div>
+    <div class="section-title">系统特色</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🧠</div>
+        <div class="feature-title">多因子选股引擎</div>
+        <div class="feature-desc">从 70+ 只美股大盘中，通过量化评分系统自动筛选出最强的 8 只股票，每月更新。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <div class="feature-title">三重风控体系</div>
+        <div class="feature-desc">市场趋势判断 + 波动率自适应仓位 + 紧急熔断机制。大跌时自动减仓或清仓保护资金。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-title">全自动运行</div>
+        <div class="feature-desc">系统每天自动监控市场，每月自动发出调仓信号。你不需要盯盘、不需要研究个股。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">透明绩效追踪</div>
+        <div class="feature-desc">每月公开展示实盘收益 vs SPY 对比、累计净值、最大回撤。所有数据已扣除交易损耗。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🚨</div>
+        <div class="feature-title">每日熔断监控</div>
+        <div class="feature-desc">系统每个交易日扫描市场风险。一旦触发熔断线，立即推送紧急警报，保护你的资金安全。</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-title">策略黑箱保护</div>
+        <div class="feature-desc">你收到的是执行信号，不是策略代码。核心算法不公开，确保系统长期有效性。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <div class="section-label">WORKFLOW</div>
+    <div class="section-title">怎么跟单</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">加入 Discord</div>
+        <div class="step-desc">免费加入 TerraQuant 频道，接收自动推送的调仓信号和熔断警报。</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">收到信号</div>
+        <div class="step-desc">每月最后一个交易日，系统自动发布目标组合：买什么、卖什么、仓位多少。</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-desc">在你的券商（Moomoo、IBKR 等）按信号等权重买入即可。每月操作一次，每次约10分钟。</div>
+        <div class="step-title">执行交易</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE STATUS -->
+  <section class="section">
+    <div class="section-label">LIVE</div>
+    <div class="section-title">当前持仓</div>
+    <div class="live-card">
+      <div class="live-pulse">
+        <span class="pulse-dot"></span>
+        实盘运行中
+      </div>
+      <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 6px;">
+        2026年2月 — 进攻模式 · 仓位 100%
+      </div>
+      <div class="live-holdings">
+        <span class="holding-chip">MU</span>
+        <span class="holding-chip">LRCX</span>
+        <span class="holding-chip">AMAT</span>
+        <span class="holding-chip">CAT</span>
+        <span class="holding-chip">INTC</span>
+        <span class="holding-chip">KLAC</span>
+        <span class="holding-chip">GOOGL</span>
+        <span class="holding-chip">MRK</span>
+      </div>
+      <div class="live-meta">
+        下次调仓日: 2026年3月最后一个交易日 · 信号将在 Discord 自动推送
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-title">开始跟单</div>
+    <div class="cta-sub">加入 Discord，免费接收每月调仓信号</div>
+    <a href="https://discord.gg/59CzVKaC" target="_blank" class="cta-btn">
+      免费加入 →
+    </a>
+    <div class="cta-note">无需付费 · 无需注册 · 所有信号实时公开</div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-disclaimer">
+      ⚠️ 免责声明：TerraQuant 提供的所有内容仅供参考和教育用途，不构成投资建议、投资推荐或交易邀约。
+      过往回测表现不代表未来实际收益。量化系统存在固有风险，包括但不限于市场风险、流动性风险和模型失效风险。
+      投资者应根据自身财务状况和风险承受能力做出独立判断。使用本系统信号进行的任何交易，风险完全由投资者自行承担。
+      TerraQuant 不是持牌金融顾问，不提供个人化投资建议。
+      <br><br>
+      © 2026 TerraQuant · All rights reserved
+    </div>
+  </footer>
+
+</div>
+
+</body>
+</html>
