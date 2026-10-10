@@ -1,0 +1,37 @@
+name: Hyperliquid expanded historical access probe
+on:
+  push:
+    paths:
+      - '.github/workflows/flow-expanded-access.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check other hours and symbols without API key
+        shell: bash
+        run: |
+          mkdir -p research/orderflow
+          python - <<'PY'
+          import requests,json,datetime
+          files=["hyperliquid_futures/2026-09-02/11/BTC_trades.parquet","hyperliquid_futures/2026-09-02/13/BTC_trades.parquet","hyperliquid_futures/2026-10-01/12/BTC_trades.parquet","hyperliquid_futures/2026-09-02/12/ETH_orderbook.parquet"]
+          out={"date":datetime.datetime.now(datetime.timezone.utc).isoformat(),"tests":[]}
+          for file in files:
+              try:
+                  r=requests.get("https://api.cryptohftdata.com/download",params={"file":file},headers={"Range":"bytes=0-1023"},timeout=35)
+                  out["tests"].append({"file":file,"http":r.status_code,"content_type":r.headers.get("Content-Type"),"response_bytes":len(r.content)})
+              except Exception as ex:out["tests"].append({"file":file,"error":str(ex)})
+          open("research/orderflow/expanded-access.json","w").write(json.dumps(out,indent=2))
+          print(json.dumps(out,indent=2))
+          PY
+      - name: Save outcome
+        run: |
+          git config user.name 'terraquant-research-bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add research/orderflow/expanded-access.json
+          git commit -m 'research: verify neighboring historical-hour access' || true
+          git push
