@@ -1,8 +1,27 @@
 name: Historical data connectivity
 on: [push, workflow_dispatch]
+permissions:
+  contents: write
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - name: Check data endpoint
-        run: curl --location --fail --silent --show-error --max-time 30 --range 0-100 -I https://datasets.tardis.dev/v1/hyperliquid/trades/2024/12/01/BTC.csv.gz
+      - name: Check endpoint and record result
+        shell: bash
+        run: |
+          mkdir -p research/orderflow
+          set +e
+          curl -L --max-time 35 -sS -o /dev/null -w 'status=%{http_code} bytes=%{size_download} ip=%{remote_ip}\n' -r 0-1023 'https://datasets.tardis.dev/v1/hyperliquid/trades/2024/12/01/BTC.csv.gz' > /tmp/check.log 2>&1
+          RESULT=$?
+          set -e
+          printf 'exit_code=%s\n' "$RESULT" > research/orderflow/connectivity-result.txt
+          cat /tmp/check.log >> research/orderflow/connectivity-result.txt
+          cat research/orderflow/connectivity-result.txt
+      - name: Commit test record
+        run: |
+          git config --global user.name 'TerraQuant Research Bot'
+          git config --global user.email 'research-bot@users.noreply.github.com'
+          git add research/orderflow/connectivity-result.txt
+          git commit -m "research: record historical data endpoint test" || true
+          git push
