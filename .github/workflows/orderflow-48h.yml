@@ -1,0 +1,34 @@
+name: Hyperliquid genuine 48-hour BTC SOL orderflow test
+on:
+  push:
+    paths:
+      - '.github/workflows/orderflow-48h.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install data dependencies
+        run: pip install -q numpy pandas pyarrow requests
+      - name: Download 48 hours of true BTC and SOL orderflow + execute holdout backtest
+        run: python -u research/orderflow/48h_backtest.py
+      - name: Commit genuine holdout results
+        shell: bash
+        run: |
+          git config user.name 'terraquant-research-bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add research/orderflow/48h-backtest.json research/orderflow/48h-backtest.md
+          git commit -m 'research: publish 48h BTC SOL genuine orderflow test' || true
+          git push
+      - name: Upload raw report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hyperliquid-48h-btc-sol-research
+          path: |
+            research/orderflow/48h-backtest.json
+            research/orderflow/48h-backtest.md
