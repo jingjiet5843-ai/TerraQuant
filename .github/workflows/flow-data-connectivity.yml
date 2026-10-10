@@ -12,33 +12,37 @@ jobs:
     timeout-minutes: 6
     steps:
       - uses: actions/checkout@v4
-        with:
-          persist-credentials: true
-      - name: Test Tardis sample and save diagnostic
+      - name: Test alternative market data hosts
         shell: bash
         run: |
           mkdir -p research/orderflow
-          set +e
-          curl -L --retry 2 --max-time 60 -sS -o /tmp/flow-sample.gz -w 'http_status=%{http_code} bytes_received=%{size_download} remote_ip=%{remote_ip}\n' --range 0-65535 'https://datasets.tardis.dev/v1/hyperliquid/trades/2024/12/01/BTC.csv.gz' > /tmp/flow-curl-result.txt 2>&1
-          rc=$?
-          set -e
           {
-            printf 'checked_at=%s\n' "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
-            printf 'curl_exit_code=%s\n' "$rc"
-            cat /tmp/flow-curl-result.txt
-          } > research/orderflow/connectivity-result.txt
+            echo "checked_at=$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            for item in "tardis_btc|https://datasets.tardis.dev/v1/hyperliquid/trades/2024/12/01/BTC.csv.gz" "tardis_l2|https://datasets.tardis.dev/v1/hyperliquid/quotes/2024/12/01/BTC.csv.gz" "tardis_2025|https://datasets.tardis.dev/v1/hyperliquid/trades/2025/01/01/BTC.csv.gz" "tardis_meta|https://api.tardis.dev/v1/exchanges/hyperliquid" "hyperliquid_api|https://api.hyperliquid.xyz/info"; do
+              name="${item%%|*}"
+              url="${item#*|}"
+              printf '%s ' "$name"
+              if [ "$name" = hyperliquid_api ]; then
+                curl -sS -L --max-time 20 -o /tmp/response -w 'http=%{http_code} bytes=%{size_download} remote_ip=%{remote_ip}\n' -H 'Content-Type: application/json' --data '{"type":"meta"}' "$url" || true
+              else
+                curl -sS -L --max-time 20 --range 0-65535 -o /tmp/response -w 'http=%{http_code} bytes=%{size_download} remote_ip=%{remote_ip}\n' "$url" || true
+              fi
+              if file /tmp/response | grep -q -i 'html\|xml'; then head -c 170 /tmp/response | tr '\n' ' ';echo; fi
+              rm -f /tmp/response
+            done
+          } > research/orderflow/connectivity-result.txt 2>&1
           cat research/orderflow/connectivity-result.txt
-      - name: Commit diagnostic back to repository
+      - name: Commit result
         shell: bash
         run: |
           git config user.name 'terraquant-research-bot'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add research/orderflow/connectivity-result.txt
-          git commit -m 'research: save hyperliquid dataset connectivity result' || true
+          git commit -m 'research: log market data connectivity variants' || true
           git push
-      - name: Upload diagnostic artifact
+      - name: Upload result
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: flow-connectivity
+          name: market-data-connectivity
           path: research/orderflow/connectivity-result.txt
