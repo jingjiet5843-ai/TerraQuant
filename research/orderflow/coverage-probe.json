@@ -1,0 +1,117 @@
+{
+  "checked_at": "2026-10-10T10:46:09.873319+00:00",
+  "files": [
+    {
+      "file": "hyperliquid_futures/2026-09-02/12/BTC_trades.parquet",
+      "status": 206,
+      "content_type": "application/vnd.apache.parquet",
+      "content_length": "4096",
+      "content_range": "bytes 0-4095/390173",
+      "first_bytes": "50415231150415a0"
+    },
+    {
+      "file": "hyperliquid_futures/2026-09-02/12/BTC_orderbook.parquet",
+      "status": 206,
+      "content_type": "application/vnd.apache.parquet",
+      "content_length": "4096",
+      "content_range": "bytes 0-4095/184118",
+      "first_bytes": "50415231150415d0"
+    },
+    {
+      "file": "hyperliquid_futures/2026-09-02/13/BTC_trades.parquet",
+      "status": 206,
+      "content_type": "application/vnd.apache.parquet",
+      "content_length": "4096",
+      "content_range": "bytes 0-4095/490586",
+      "first_bytes": "5041523115041590"
+    },
+    {
+      "file": "hyperliquid_futures/2026-09-02/13/BTC_orderbook.parquet",
+      "status": 206,
+      "content_type": "application/vnd.apache.parquet",
+      "content_length": "4096",
+      "content_range": "bytes 0-4095/195262",
+      "first_bytes": "50415231150415e0"
+    },
+    {
+      "file": "hyperliquid_futures/2026-09-02/11/BTC_trades.parquet",
+      "status": 206,
+      "content_type": "application/vnd.apache.parquet",
+      "content_length": "4096",
+      "content_range": "bytes 0-4095/471013",
+      "first_bytes": "50415231150415a0"
+    },
+    {
+      "file": "hyperliquid_futures/2026-09-02/11/BTC_orderbook.parquet",
+      "status": 206,
+      "content_type": "application/vnd.apache.parquet",
+      "content_length": "4096",
+      "content_range": "bytes 0-4095/190448",
+      "first_bytes": "50415231150415f0"
+    },
+    {
+      "file": "hyperliquid_futures/2026-09-03/12/BTC_trades.parquet",
+      "status": 206,
+      "content_type": "application/vnd.apache.parquet",
+      "content_length": "4096",
+      "content_range": "bytes 0-4095/462531",
+      "first_bytes": "50415231150415e0"
+    },
+    {
+      "file": "hyperliquid_futures/2026-09-03/12/BTC_orderbook.parquet",
+      "status": 206,
+      "content_type": "application/vnd.apache.parquet",
+      "content_length": "4096",
+      "content_range": "bytes 0-4095/193192",
+      "first_bytes": "50415231150415f0"
+    },
+    {
+      "file": "hyperliquid_futures/2026-09-02/12/ETH_trades.parquet",
+      "status": 206,
+      "content_type": "application/vnd.apache.parquet",
+      "content_length": "4096",
+      "content_range": "bytes 0-4095/142328",
+      "first_bytes": "5041523115041590"
+    },
+    {
+      "file": "hyperliquid_futures/2026-09-02/12/ETH_orderbook.parquet",
+      "status": 206,
+      "content_type": "application/vnd.apache.parquet",
+      "content_length": "4096",
+      "content_range": "bytes 0-4095/196716",
+      "first_bytes": "50415231150415a0"
+    },
+    {
+      "file": "hyperliquid_futures/2026-09-02/12/SOL_trades.parquet",
+      "status": 206,
+      "content_type": "application/vnd.apache.parquet",
+      "content_length": "4096",
+      "content_range": "bytes 0-4095/76489",
+      "first_bytes": "50415231150415b0"
+    },
+    {
+      "file": "hyperliquid_futures/2026-09-02/12/SOL_orderbook.parquet",
+      "status": 206,
+      "content_type": "application/vnd.apache.parquet",
+      "content_length": "4096",
+      "content_range": "bytes 0-4095/138060",
+      "first_bytes": "50415231150415a0"
+    },
+    {
+      "file": "hyperliquid_futures/2026-10-01/12/BTC_trades.parquet",
+      "status": 206,
+      "content_type": "application/vnd.apache.parquet",
+      "content_length": "4096",
+      "content_range": "bytes 0-4095/162033",
+      "first_bytes": "5041523115041580"
+    },
+    {
+      "file": "hyperliquid_futures/2026-10-01/12/BTC_orderbook.parquet",
+      "status": 206,
+      "content_type": "application/vnd.apache.parquet",
+      "content_length": "4096",
+      "content_range": "bytes 0-4095/191505",
+      "first_bytes": "5041523115041580"
+    }
+  ]
+}
