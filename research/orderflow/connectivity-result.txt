@@ -1,3 +1,10 @@
-checked_at=2026-10-10T10:37:07Z
-curl_exit_code=0
-http_status=403 bytes_received=4546 remote_ip=104.18.6.96
+checked_at=2026-10-10T10:38:14Z
+tardis_btc http=403 bytes=4544 remote_ip=104.18.6.96
+<!DOCTYPE html> <!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]--> <!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]--> <!--
+tardis_l2 http=403 bytes=4544 remote_ip=104.18.6.96
+<!DOCTYPE html> <!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]--> <!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]--> <!--
+tardis_2025 http=403 bytes=4544 remote_ip=104.18.6.96
+<!DOCTYPE html> <!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]--> <!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]--> <!--
+tardis_meta http=403 bytes=4544 remote_ip=104.18.7.96
+<!DOCTYPE html> <!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]--> <!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]--> <!--
+hyperliquid_api http=200 bytes=17628 remote_ip=143.204.1.47
