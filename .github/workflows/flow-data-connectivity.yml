@@ -1,27 +1,44 @@
 name: Historical data connectivity
-on: [push, workflow_dispatch]
+on:
+  push:
+    paths:
+      - '.github/workflows/flow-data-connectivity.yml'
+  workflow_dispatch:
 permissions:
   contents: write
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 6
     steps:
-      - name: Check endpoint and record result
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Test Tardis sample and save diagnostic
         shell: bash
         run: |
           mkdir -p research/orderflow
           set +e
-          curl -L --max-time 35 -sS -o /dev/null -w 'status=%{http_code} bytes=%{size_download} ip=%{remote_ip}\n' -r 0-1023 'https://datasets.tardis.dev/v1/hyperliquid/trades/2024/12/01/BTC.csv.gz' > /tmp/check.log 2>&1
-          RESULT=$?
+          curl -L --retry 2 --max-time 60 -sS -o /tmp/flow-sample.gz -w 'http_status=%{http_code} bytes_received=%{size_download} remote_ip=%{remote_ip}\n' --range 0-65535 'https://datasets.tardis.dev/v1/hyperliquid/trades/2024/12/01/BTC.csv.gz' > /tmp/flow-curl-result.txt 2>&1
+          rc=$?
           set -e
-          printf 'exit_code=%s\n' "$RESULT" > research/orderflow/connectivity-result.txt
-          cat /tmp/check.log >> research/orderflow/connectivity-result.txt
+          {
+            printf 'checked_at=%s\n' "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            printf 'curl_exit_code=%s\n' "$rc"
+            cat /tmp/flow-curl-result.txt
+          } > research/orderflow/connectivity-result.txt
           cat research/orderflow/connectivity-result.txt
-      - name: Commit test record
+      - name: Commit diagnostic back to repository
+        shell: bash
         run: |
-          git config --global user.name 'TerraQuant Research Bot'
-          git config --global user.email 'research-bot@users.noreply.github.com'
+          git config user.name 'terraquant-research-bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add research/orderflow/connectivity-result.txt
-          git commit -m "research: record historical data endpoint test" || true
+          git commit -m 'research: save hyperliquid dataset connectivity result' || true
           git push
+      - name: Upload diagnostic artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flow-connectivity
+          path: research/orderflow/connectivity-result.txt
