@@ -1,0 +1,53 @@
+name: Hyperliquid free historical sample schema
+on:
+  push:
+    paths:
+      - '.github/workflows/flow-historical-sample.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  sample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install parquet reader
+        run: pip install -q pandas pyarrow requests
+      - name: Download free genuine hour
+        shell: bash
+        run: |
+          mkdir -p research/orderflow
+          cat > /tmp/sample.py <<'PY'
+          import requests,pyarrow.parquet as pq,collections,json,datetime,os
+          base="https://api.cryptohftdata.com/download?file=hyperliquid_futures%2F2026-09-02%2F12%2FBTC_"
+          report={"date":"2026-09-02","hour_utc":12,"coin":"BTC","retrieved_at":datetime.datetime.now(datetime.timezone.utc).isoformat()}
+          for typ in ("trades","orderbook"):
+              filename="/tmp/hl_"+typ+".parquet"
+              try:
+                  with requests.get(base+typ+".parquet",timeout=80,stream=True) as resp:
+                      print("HTTP",typ,resp.status_code,resp.url.split('?')[0],flush=True)
+                      resp.raise_for_status()
+                      size=0
+                      with open(filename,"wb") as out:
+                          for data in resp.iter_content(256*1024):
+                              out.write(data);size+=len(data)
+                              if size>100*1024*1024:raise RuntimeError("sample unexpectedly >100MB")
+                  table=pq.read_table(filename)
+                  cols=table.column_names
+                  data=table.to_pandas()
+                  report[typ]={"bytes":size,"rows":len(data),"columns":cols,"event_types":data["event_type"].value_counts().head(8).to_dict() if "event_type" in cols else None,"time_min":int(data["event_time"].min()),"time_max":int(data["event_time"].max()),"sample":data.head(2).fillna("").astype(str).to_dict(orient="records")}
+              except Exception as ex: report[typ]={"error":str(ex)}
+          with open("research/orderflow/free-hour-schema.json","w") as f:json.dump(report,f,indent=2,default=str)
+          print(json.dumps(report,indent=2,default=str))
+          PY
+          python /tmp/sample.py
+      - name: Persist outcome
+        if: always()
+        shell: bash
+        run: |
+          git config user.name 'terraquant-research-bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add research/orderflow/free-hour-schema.json || true
+          git commit -m 'research: verify free historic BTC trades and L2 order book' || true
+          git push
