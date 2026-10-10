@@ -1,0 +1,42 @@
+name: Probe multi-hour orderflow availability
+on:
+  push:
+    paths:
+      - '.github/workflows/flow-access-coverage.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for multi-hour BTC ETH SOL sample availability
+        run: |
+          mkdir -p research/orderflow
+          cat > /tmp/coverage.py <<'PY'
+          import requests,json,datetime
+          cases=[("2026-09-02","12","BTC"),("2026-09-02","13","BTC"),("2026-09-02","11","BTC"),("2026-09-03","12","BTC"),("2026-09-02","12","ETH"),("2026-09-02","12","SOL"),("2026-10-01","12","BTC")]
+          records=[]
+          for day,hour,coin in cases:
+            for kind in ("trades","orderbook"):
+              path=f"hyperliquid_futures/{day}/{hour}/{coin}_{kind}.parquet"
+              try:
+                with requests.get("https://api.cryptohftdata.com/download",params={"file":path},headers={"Range":"bytes=0-4095"},timeout=25,stream=True) as r:
+                  content=next(r.iter_content(chunk_size=4096),b"")
+                  result={"file":path,"status":r.status_code,"content_type":r.headers.get("content-type"),"content_length":r.headers.get("content-length"),"content_range":r.headers.get("content-range"),"first_bytes":content[:8].hex()}
+              except Exception as exc: result={"file":path,"error":str(exc)}
+              records.append(result)
+          out={"checked_at":datetime.datetime.now(datetime.timezone.utc).isoformat(),"files":records}
+          with open("research/orderflow/coverage-probe.json","w") as f:json.dump(out,f,indent=2)
+          print(json.dumps(out,indent=2))
+          PY
+          python /tmp/coverage.py
+      - name: Commit report
+        run: |
+          git config user.name 'terraquant-research-bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add research/orderflow/coverage-probe.json
+          git commit -m 'research: record additional free sample availability' || true
+          git push
