@@ -1,0 +1,33 @@
+name: Hyperliquid 24-hour orderflow backtest
+on:
+  push:
+    paths:
+      - '.github/workflows/flow-day-backtest.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install data analysis dependencies
+        run: pip install -q pandas numpy pyarrow requests
+      - name: Download real full-day trades and orderbook and screen six strategies
+        run: python research/orderflow/one_day_backtest.py
+      - name: Commit one-day results
+        run: |
+          git config user.name 'terraquant-research-bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add research/orderflow/first-real-day-backtest.json research/orderflow/first-real-day-backtest.md
+          git commit -m 'research: save 24-hour Hyperliquid BTC orderflow screening results' || true
+          git push
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hyperliquid-btc-day-backtest
+          path: |
+            research/orderflow/first-real-day-backtest.json
+            research/orderflow/first-real-day-backtest.md
