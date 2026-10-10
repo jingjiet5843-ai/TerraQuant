@@ -1,0 +1,104 @@
+{
+  "date": "2026-09-02",
+  "hour_utc": 12,
+  "coin": "BTC",
+  "retrieved_at": "2026-10-10T10:41:52.703609+00:00",
+  "trades": {
+    "bytes": 390173,
+    "rows": 20881,
+    "columns": [
+      "received_time",
+      "event_time",
+      "symbol",
+      "trade_id",
+      "price",
+      "quantity",
+      "trade_time",
+      "is_buyer_maker",
+      "order_type"
+    ],
+    "event_types": null,
+    "time_min": 1788350400299,
+    "time_max": 1788353999067,
+    "sample": [
+      {
+        "received_time": "1788350401344768285",
+        "event_time": "1788350400299",
+        "symbol": "BTC",
+        "trade_id": "192141266982723",
+        "price": "76835.0",
+        "quantity": "0.00474",
+        "trade_time": "1788350400299",
+        "is_buyer_maker": "True",
+        "order_type": "market"
+      },
+      {
+        "received_time": "1788350401507465454",
+        "event_time": "1788350400422",
+        "symbol": "BTC",
+        "trade_id": "324728572371362",
+        "price": "76835.0",
+        "quantity": "2.46193",
+        "trade_time": "1788350400422",
+        "is_buyer_maker": "True",
+        "order_type": "market"
+      }
+    ]
+  },
+  "orderbook": {
+    "bytes": 184118,
+    "rows": 26120,
+    "columns": [
+      "received_time",
+      "event_time",
+      "transaction_time",
+      "symbol",
+      "event_type",
+      "first_update_id",
+      "final_update_id",
+      "prev_final_update_id",
+      "last_update_id",
+      "side",
+      "price",
+      "quantity",
+      "order_count"
+    ],
+    "event_types": {
+      "snapshot": 26120
+    },
+    "time_min": 1788350400000,
+    "time_max": 1788353996369,
+    "sample": [
+      {
+        "received_time": "1788350400000000000",
+        "event_time": "1788350400000",
+        "transaction_time": "",
+        "symbol": "BTC",
+        "event_type": "snapshot",
+        "first_update_id": "",
+        "final_update_id": "1788350395993",
+        "prev_final_update_id": "",
+        "last_update_id": "1788350395993",
+        "side": "bid",
+        "price": "76812.0",
+        "quantity": "4.04746",
+        "order_count": "6"
+      },
+      {
+        "received_time": "1788350400000000000",
+        "event_time": "1788350400000",
+        "transaction_time": "",
+        "symbol": "BTC",
+        "event_type": "snapshot",
+        "first_update_id": "",
+        "final_update_id": "1788350395993",
+        "prev_final_update_id": "",
+        "last_update_id": "1788350395993",
+        "side": "bid",
+        "price": "76813.0",
+        "quantity": "3.88592",
+        "order_count": "5"
+      }
+    ]
+  }
+}
