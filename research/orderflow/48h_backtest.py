@@ -47,7 +47,7 @@ def coin_research(symbol):
                 print("DOWNLOAD_FAILED",path,str(e),flush=True)
                 failures.append({"path":path,"error":str(e)})
         if h%6==5:print("PROGRESS",symbol,h+1,"/",HOURS,"hours",flush=True)
-        time.sleep(0.35) # Well below free tier 60 requests/min over sustained hours.
+        time.sleep(2.2) # Two requests per hour of archive; respect free-tier per-IP limit.
     if failures:raise RuntimeError(f"{symbol} missing historical hour files: {str(failures[:10])}")
     tr=pd.concat(raw_trades,ignore_index=True)
     ob=pd.concat(raw_books,ignore_index=True)
