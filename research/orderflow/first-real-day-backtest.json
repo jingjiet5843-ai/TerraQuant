@@ -1,0 +1,232 @@
+{
+  "sample": {
+    "source": "CryptoHFTData anonymous full-day download: Hyperliquid Futures BTC 2026-09-02",
+    "coin": "BTC",
+    "first_time": "2026-09-02T00:00:00+00:00",
+    "last_time": "2026-09-02T23:59:59.415537+00:00",
+    "trade_rows": 356331,
+    "book_rows": 642640,
+    "book_snapshots": 16066,
+    "median_snapshot_spacing_s": 5.389,
+    "max_snapshot_spacing_s": 131.138,
+    "sample_trade_bytes": 6910245,
+    "sample_orderbook_bytes": 4445868
+  },
+  "protocol": {
+    "split": "first 70% of clock time train, last 30% test; exclude boundary-crossing trades",
+    "signal_information": "last 30 seconds of trade notional and book depth; strictly prior received timestamps",
+    "entry": "earliest book snapshot at least 3s after signal, reject if over 12s stale",
+    "exit": "first book snapshot at least hold_seconds after entry, reject if over 12s stale",
+    "prices": "long entry ask / exit bid; short entry bid / exit ask",
+    "taker_fee_roundtrip_bps": 9,
+    "additional_adverse_roundtrip_bps": 2,
+    "funding": "omitted on <=120s horizons",
+    "simultaneous_exposure": "no overlapping trades per strategy and 30s cooldown",
+    "limitations": [
+      "single trading day cannot establish alpha",
+      "snapshots are not continuous L2 updates",
+      "no maker queue model",
+      "slippage stress model is assumed, not fitted"
+    ]
+  },
+  "results": [
+    {
+      "strategy": "flow_momentum",
+      "hold_seconds": 30,
+      "train_trades": 481,
+      "test_trades": 147,
+      "train_mean_net_bps": -11.0797,
+      "test_mean_gross_bps": -0.0441,
+      "test_mean_net_bps": -11.0441,
+      "test_win_rate": 0.0,
+      "test_total_net_bps": -1623.479
+    },
+    {
+      "strategy": "flow_momentum",
+      "hold_seconds": 60,
+      "train_trades": 378,
+      "test_trades": 123,
+      "train_mean_net_bps": -11.1949,
+      "test_mean_gross_bps": -0.0065,
+      "test_mean_net_bps": -11.0065,
+      "test_win_rate": 0.0244,
+      "test_total_net_bps": -1353.802
+    },
+    {
+      "strategy": "flow_momentum",
+      "hold_seconds": 120,
+      "train_trades": 271,
+      "test_trades": 95,
+      "train_mean_net_bps": -11.3257,
+      "test_mean_gross_bps": 0.2504,
+      "test_mean_net_bps": -10.7496,
+      "test_win_rate": 0.0316,
+      "test_total_net_bps": -1021.216
+    },
+    {
+      "strategy": "flow_exhaustion",
+      "hold_seconds": 30,
+      "train_trades": 621,
+      "test_trades": 260,
+      "train_mean_net_bps": -11.0784,
+      "test_mean_gross_bps": -0.5631,
+      "test_mean_net_bps": -11.5631,
+      "test_win_rate": 0.0,
+      "test_total_net_bps": -3006.401
+    },
+    {
+      "strategy": "flow_exhaustion",
+      "hold_seconds": 60,
+      "train_trades": 462,
+      "test_trades": 194,
+      "train_mean_net_bps": -11.4868,
+      "test_mean_gross_bps": -0.3819,
+      "test_mean_net_bps": -11.3819,
+      "test_win_rate": 0.0,
+      "test_total_net_bps": -2208.082
+    },
+    {
+      "strategy": "flow_exhaustion",
+      "hold_seconds": 120,
+      "train_trades": 311,
+      "test_trades": 132,
+      "train_mean_net_bps": -10.899,
+      "test_mean_gross_bps": -0.8662,
+      "test_mean_net_bps": -11.8662,
+      "test_win_rate": 0.0152,
+      "test_total_net_bps": -1566.334
+    },
+    {
+      "strategy": "book_imbalance",
+      "hold_seconds": 30,
+      "train_trades": 736,
+      "test_trades": 297,
+      "train_mean_net_bps": -11.0786,
+      "test_mean_gross_bps": 0.2285,
+      "test_mean_net_bps": -10.7715,
+      "test_win_rate": 0.0034,
+      "test_total_net_bps": -3199.126
+    },
+    {
+      "strategy": "book_imbalance",
+      "hold_seconds": 60,
+      "train_trades": 529,
+      "test_trades": 214,
+      "train_mean_net_bps": -10.9914,
+      "test_mean_gross_bps": 0.4687,
+      "test_mean_net_bps": -10.5313,
+      "test_win_rate": 0.014,
+      "test_total_net_bps": -2253.706
+    },
+    {
+      "strategy": "book_imbalance",
+      "hold_seconds": 120,
+      "train_trades": 347,
+      "test_trades": 146,
+      "train_mean_net_bps": -11.3833,
+      "test_mean_gross_bps": -0.0519,
+      "test_mean_net_bps": -11.0519,
+      "test_win_rate": 0.0274,
+      "test_total_net_bps": -1613.58
+    },
+    {
+      "strategy": "sweep_reversion",
+      "hold_seconds": 30,
+      "train_trades": 26,
+      "test_trades": 0,
+      "train_mean_net_bps": -9.4656,
+      "test_mean_gross_bps": null,
+      "test_mean_net_bps": null,
+      "test_win_rate": null,
+      "test_total_net_bps": 0
+    },
+    {
+      "strategy": "sweep_reversion",
+      "hold_seconds": 60,
+      "train_trades": 26,
+      "test_trades": 0,
+      "train_mean_net_bps": -10.0518,
+      "test_mean_gross_bps": null,
+      "test_mean_net_bps": null,
+      "test_win_rate": null,
+      "test_total_net_bps": 0
+    },
+    {
+      "strategy": "sweep_reversion",
+      "hold_seconds": 120,
+      "train_trades": 26,
+      "test_trades": 0,
+      "train_mean_net_bps": -9.8242,
+      "test_mean_gross_bps": null,
+      "test_mean_net_bps": null,
+      "test_win_rate": null,
+      "test_total_net_bps": 0
+    },
+    {
+      "strategy": "price_momentum",
+      "hold_seconds": 30,
+      "train_trades": 390,
+      "test_trades": 107,
+      "train_mean_net_bps": -11.268,
+      "test_mean_gross_bps": -0.0644,
+      "test_mean_net_bps": -11.0644,
+      "test_win_rate": 0.0093,
+      "test_total_net_bps": -1183.888
+    },
+    {
+      "strategy": "price_momentum",
+      "hold_seconds": 60,
+      "train_trades": 308,
+      "test_trades": 89,
+      "train_mean_net_bps": -10.8599,
+      "test_mean_gross_bps": -0.3669,
+      "test_mean_net_bps": -11.3669,
+      "test_win_rate": 0.0225,
+      "test_total_net_bps": -1011.651
+    },
+    {
+      "strategy": "price_momentum",
+      "hold_seconds": 120,
+      "train_trades": 227,
+      "test_trades": 72,
+      "train_mean_net_bps": -10.3084,
+      "test_mean_gross_bps": -0.7131,
+      "test_mean_net_bps": -11.7131,
+      "test_win_rate": 0.0278,
+      "test_total_net_bps": -843.343
+    },
+    {
+      "strategy": "price_reversion",
+      "hold_seconds": 30,
+      "train_trades": 390,
+      "test_trades": 107,
+      "train_mean_net_bps": -11.0467,
+      "test_mean_gross_bps": -0.2018,
+      "test_mean_net_bps": -11.2018,
+      "test_win_rate": 0.0,
+      "test_total_net_bps": -1198.591
+    },
+    {
+      "strategy": "price_reversion",
+      "hold_seconds": 60,
+      "train_trades": 308,
+      "test_trades": 89,
+      "train_mean_net_bps": -11.4683,
+      "test_mean_gross_bps": 0.0934,
+      "test_mean_net_bps": -10.9066,
+      "test_win_rate": 0.0112,
+      "test_total_net_bps": -970.688
+    },
+    {
+      "strategy": "price_reversion",
+      "hold_seconds": 120,
+      "train_trades": 227,
+      "test_trades": 72,
+      "train_mean_net_bps": -11.991,
+      "test_mean_gross_bps": 0.4452,
+      "test_mean_net_bps": -10.5548,
+      "test_win_rate": 0.0694,
+      "test_total_net_bps": -759.947
+    }
+  ]
+}
