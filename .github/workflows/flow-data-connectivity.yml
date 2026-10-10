@@ -1,5 +1,5 @@
 name: Historical data connectivity
-on: workflow_dispatch
+on: [push, workflow_dispatch]
 jobs:
   verify:
     runs-on: ubuntu-latest
