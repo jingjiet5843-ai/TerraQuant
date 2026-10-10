@@ -1,0 +1,8 @@
+name: Historical data connectivity
+on: workflow_dispatch
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check data endpoint
+        run: curl --location --fail --silent --show-error --max-time 30 --range 0-100 -I https://datasets.tardis.dev/v1/hyperliquid/trades/2024/12/01/BTC.csv.gz
