@@ -1,0 +1,68 @@
+{
+  "captured_at": "2026-10-10T10:39:57.931295+00:00",
+  "records": {
+    "BTC": {
+      "trades": 10,
+      "first_trade_time": 1791628790463,
+      "last_trade_time": 1791628795010,
+      "bid": 82775.0,
+      "ask": 82776.0,
+      "spread_bps": 0.121,
+      "book_time": 1791628797427,
+      "trade_columns": [
+        "coin",
+        "hash",
+        "px",
+        "side",
+        "sz",
+        "tid",
+        "time",
+        "users"
+      ],
+      "bid_levels": 20,
+      "ask_levels": 20
+    },
+    "ETH": {
+      "trades": 10,
+      "first_trade_time": 1791628763403,
+      "last_trade_time": 1791628780320,
+      "bid": 2493.0,
+      "ask": 2493.1,
+      "spread_bps": 0.401,
+      "book_time": 1791628798031,
+      "trade_columns": [
+        "coin",
+        "hash",
+        "px",
+        "side",
+        "sz",
+        "tid",
+        "time",
+        "users"
+      ],
+      "bid_levels": 20,
+      "ask_levels": 20
+    },
+    "SOL": {
+      "trades": 10,
+      "first_trade_time": 1791628757844,
+      "last_trade_time": 1791628796217,
+      "bid": 109.47,
+      "ask": 109.48,
+      "spread_bps": 0.913,
+      "book_time": 1791628798031,
+      "trade_columns": [
+        "coin",
+        "hash",
+        "px",
+        "side",
+        "sz",
+        "tid",
+        "time",
+        "users"
+      ],
+      "bid_levels": 20,
+      "ask_levels": 20
+    }
+  }
+}
