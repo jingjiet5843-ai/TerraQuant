@@ -1,0 +1,45 @@
+name: Hyperliquid live orderflow probe
+on:
+  push:
+    paths:
+      - '.github/workflows/flow-live-probe.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch authentic trades and order book samples
+        shell: bash
+        run: |
+          mkdir -p research/orderflow
+          cat > /tmp/probe.py <<'PY'
+          import urllib.request,json,datetime,time
+          def call(type_,coin):
+              body=json.dumps({"type":type_,"coin":coin}).encode()
+              req=urllib.request.Request("https://api.hyperliquid.xyz/info",data=body,headers={"Content-Type":"application/json"})
+              with urllib.request.urlopen(req,timeout=20) as r: return json.load(r)
+          data={"captured_at":datetime.datetime.now(datetime.timezone.utc).isoformat(),"records":{}}
+          for coin in ("BTC","ETH","SOL"):
+              try:
+                  trades=call("recentTrades",coin);book=call("l2Book",coin)
+                  bids=book.get("levels",[[],[]])[0];asks=book.get("levels",[[],[]])[1]
+                  b=float(bids[0]["px"]) if bids else None
+                  a=float(asks[0]["px"]) if asks else None
+                  times=[int(x["time"]) for x in trades]
+                  data["records"][coin]={"trades":len(trades),"first_trade_time":min(times) if times else None,"last_trade_time":max(times) if times else None,"bid":b,"ask":a,"spread_bps":round((a/b-1)*10000,3) if b and a else None,"book_time":book.get("time"),"trade_columns":sorted(trades[0].keys()) if trades else [],"bid_levels":len(bids),"ask_levels":len(asks)}
+              except Exception as e: data["records"][coin]={"error":str(e)}
+          with open("research/orderflow/live-probe-result.json","w") as f:json.dump(data,f,indent=2)
+          print(json.dumps(data,indent=2))
+          PY
+          python /tmp/probe.py
+      - name: Save probe to repository
+        run: |
+          git config user.name 'terraquant-research-bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add research/orderflow/live-probe-result.json
+          git commit -m 'research: save Hyperliquid real market data probe' || true
+          git push
